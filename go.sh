@@ -15,7 +15,7 @@ mkdir --parents ~/.local/bin
 # mise
 
 # renovate: datasource=github-releases depName=jdx/mise
-MISE_VERSION=2026.3.10
+MISE_VERSION=2026.4.3
 export MISE_VERSION
 
 curl https://mise.run/bash | sh
