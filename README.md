@@ -10,6 +10,8 @@ Create a new cloud environment:
 2. Network access: Custom
 3. Allowed domains:
     ```
+    mise.run
+    mise.jdx.dev
     fs.liujiacai.netbuilds
     pkg.earth
     pkg.hexops.org
