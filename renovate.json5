@@ -1,0 +1,37 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "addLabels": [
+        "{{manager}}",
+    ],
+    "extends": [
+        "config:recommended",
+    ],
+    "customManagers": [
+        {
+            "customType": "regex",
+            "managerFilePatterns": [
+                "**/[Ss]hell*.sh",
+                "**/*.sh",
+            ],
+            "matchStrings": [
+                "# renovate: datasource=(?<datasource>[a-zA-Z0-9-._]+?) depName=(?<depName>[^\\s]+?)(?: (?:packageName)=(?<packageName>[^\\s]+?))?(?: versioning=(?<versioning>[^\\s]+?))?(?: extractVersion=(?<extractVersion>[^\\s]+?))?\\s+[A-Za-z0-9_]+_VERSION\\s*=\\s*[\"']?(?<currentValue>.+?)[\"']?\\s",
+            ],
+        },
+    ],
+    "labels": [
+        "dependencies",
+    ],
+    "minimumReleaseAge": "7 days",
+    "schedule": [
+        "on the 20th day of the month",
+    ],
+    "vulnerabilityAlerts": {
+        "addLabels": [
+            "security",
+        ],
+        "minimumReleaseAge": "0 days",
+        "schedule": [
+            "at any time",
+        ],
+    },
+}
