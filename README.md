@@ -11,6 +11,7 @@ Create a new cloud environment:
 3. Allowed domains:
     ```
     mise-java.jdx.dev
+    mise-versions.jdx.dev
     mise.jdx.dev
     mise.run
     fs.liujiacai.netbuilds
