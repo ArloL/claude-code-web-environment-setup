@@ -10,12 +10,11 @@ set
 wget --version
 curl --version
 
-mkdir --parents ~/.local/bin
+git clone \
+    --depth=1 \
+    --single-branch \
+    --no-tags \
+    https://github.com/ArloL/claude-code-web-environment-setup.git \
+    "${HOME}/arlo-setup"
 
-# mise
-
-# renovate: datasource=github-releases depName=jdx/mise
-MISE_VERSION=2026.4.3
-export MISE_VERSION
-
-curl https://mise.run/bash | sh
+sh "${HOME}/arlo-setup/setup.sh"

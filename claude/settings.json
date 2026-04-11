@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/arlo-setup/claude/session-start.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
