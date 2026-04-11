@@ -12,7 +12,5 @@ set -o pipefail
 # shellcheck disable=SC1090
 source "${CLAUDE_ENV_FILE}"
 
-SCRIPTS_DIR="${HOME}/arlo-setup/scripts"
-
 echo "Configuring Maven proxy..."
-python3 "${SCRIPTS_DIR}/configure-maven-proxy.py"
+python3 "${HOME}/arlo-setup/claude/configure-maven-proxy.py"
