@@ -1,0 +1,68 @@
+name: PR check
+
+on:
+  push:
+  pull_request:
+    branches:
+    - main
+    types:
+    - reopened
+  schedule:
+  - cron: "2 16 31 * *"
+permissions: {}
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Dump GitHub context
+      env:
+        GITHUB_CONTEXT: ${{ toJSON(github) }}
+      run: echo "$GITHUB_CONTEXT"
+    - name: Dump job context
+      env:
+        JOB_CONTEXT: ${{ toJSON(job) }}
+      run: echo "$JOB_CONTEXT"
+    - name: Dump steps context
+      env:
+        STEPS_CONTEXT: ${{ toJSON(steps) }}
+      run: echo "$STEPS_CONTEXT"
+    - name: Dump runner context
+      env:
+        RUNNER_CONTEXT: ${{ toJSON(runner) }}
+      run: echo "$RUNNER_CONTEXT"
+    - name: Dump strategy context
+      env:
+        STRATEGY_CONTEXT: ${{ toJSON(strategy) }}
+      run: echo "$STRATEGY_CONTEXT"
+    - name: Dump matrix context
+      env:
+        MATRIX_CONTEXT: ${{ toJSON(matrix) }}
+      run: echo "$MATRIX_CONTEXT"
+    - name: Dump environment variables
+      run: set
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      with:
+        persist-credentials: false
+    - run: sh setup.sh
+    - name: Make sure build did not change anything
+      run: git diff --exit-code
+  required-status-check:
+    name: pr-check.required-status-check
+    needs:
+    - test
+    # GitHub Actions skips this job when any of the dependents fail. And skips
+    # are considered success in their weird logic. So we always run it and fail
+    # ourselves if necessary
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+    - run: echo "Use this job as the required status check of this workflow"
+    - name: Check that all jobs were successful
+      env:
+        RESULTS: ${{ toJSON(needs) }}
+      run: |
+        echo "$RESULTS" | jq --exit-status 'all(.result == "success")' || exit 1
