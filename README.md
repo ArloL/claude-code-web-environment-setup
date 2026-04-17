@@ -10,6 +10,7 @@ Create a new cloud environment:
 2. Network access: Custom
 3. Allowed domains:
     ```
+    jitpack.io
     mise-java.jdx.dev
     mise-versions.jdx.dev
     mise.jdx.dev
