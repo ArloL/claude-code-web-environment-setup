@@ -13,6 +13,7 @@ Create a new cloud environment:
     jitpack.io
     mise-java.jdx.dev
     mise-versions.jdx.dev
+    mise.en.dev
     mise.jdx.dev
     mise.run
     fs.liujiacai.netbuilds
