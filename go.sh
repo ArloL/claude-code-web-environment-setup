@@ -19,6 +19,7 @@ curl --version
 mkdir -p "${HOME}/arlo-setup"
 curl -fsSL \
     https://codeload.github.com/ArloL/claude-code-web-environment-setup/tar.gz/refs/heads/main \
-    | tar -xz --strip-components=1 -C "${HOME}/arlo-setup"
+    -o "${HOME}/arlo-setup.tgz"
+tar -xzf "${HOME}/arlo-setup.tgz" --strip-components=1 -C "${HOME}/arlo-setup"
 
 sh "${HOME}/arlo-setup/setup.sh"
