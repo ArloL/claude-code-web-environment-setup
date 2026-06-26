@@ -33,6 +33,8 @@ Create a new cloud environment:
     ziglang.org
     zigmirror.com
     zigmirror.hryx.net
+    python.org
+    www.python.org
     ```
 4. Environment variables:
     ```
