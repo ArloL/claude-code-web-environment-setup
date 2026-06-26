@@ -8,4 +8,12 @@ set -o xtrace
 MISE_VERSION=2026.6.9
 export MISE_VERSION
 
-curl https://mise.run/bash | sh
+# Download first, then run: a piped `curl ... | sh` would hide a failed
+# download because dash's `sh` lacks `pipefail`, so the pipeline reports the
+# (successful) `sh` exit code while mise never actually installs. Writing to a
+# file lets `curl -fsSL` + `errexit` stop setup loudly on a blocked/failed
+# download instead of failing later at `mise install`.
+install_script="$(mktemp)"
+trap 'rm -f "${install_script}"' EXIT
+curl -fsSL https://mise.run/bash -o "${install_script}"
+sh "${install_script}"
