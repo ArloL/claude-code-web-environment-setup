@@ -16,8 +16,8 @@ Create a new cloud environment:
     mise.en.dev
     mise.jdx.dev
     mise.run
-    fs.liujiacai.netbuilds
-    pkg.earth
+    fs.liujiacai.net
+    builds.pkg.earth
     pkg.hexops.org
     zig-mirror.tsimnet.eu
     zig.chainsafe.dev
