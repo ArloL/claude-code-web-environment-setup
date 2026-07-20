@@ -5,7 +5,7 @@ set -o nounset
 set -o xtrace
 
 # renovate: datasource=github-releases depName=jdx/mise
-MISE_VERSION=2026.6.9
+MISE_VERSION=2026.7.5
 export MISE_VERSION
 
 # Download first, then run: a piped `curl ... | sh` would hide a failed
