@@ -37,6 +37,11 @@ Create a new cloud environment:
     zigmirror.hryx.net
     python.org
     www.python.org
+    download.mozilla.org
+    download-installer.cdn.mozilla.net
+    archive.mozilla.org
+    ftp.mozilla.org
+    product-details.mozilla.org
     ```
 4. Environment variables:
     ```
