@@ -12,6 +12,8 @@ Create a new cloud environment:
     ```
     github.com
     codeload.github.com
+    objects.githubusercontent.com
+    release-assets.githubusercontent.com
     jitpack.io
     mise-java.jdx.dev
     mise-versions.jdx.dev
