@@ -1,0 +1,37 @@
+# mise itself, and the metadata hosts its backends query.
+#
+# mise does not publish a list of hosts it contacts, so the source is the only
+# source of truth. To re-derive it:
+#
+#   git clone --depth 1 https://github.com/jdx/mise.git && cd mise
+#   grep --recursive --extended-regexp --only-matching --include='*.rs' \
+#       'https://[a-zA-Z0-9._-]+' src crates | sort --unique
+#
+# settings.toml in that repo is the machine-readable file for URL-valued
+# defaults ([python.pyenv_repo], [go.download_mirror], ...).
+
+# One wildcard instead of three exact hosts. What is actually behind it:
+#   mise.jdx.dev          - install.sh, registry/latest.tar.zst (src/registry.rs),
+#                           VERSION for the update check (src/cli/version.rs)
+#   mise-versions.jdx.dev - version/release/attestation API (src/versions_host.rs)
+#                           and the precompiled-CPython index (src/plugins/core/python.rs)
+#   mise-java.jdx.dev     - JVM metadata index (src/plugins/core/java.rs)
+*.jdx.dev
+
+# Serves mise/setup.sh's install script. A Cloudflare Worker that proxies
+# mise.jdx.dev server-side (cloudflare/workers/mise-run.js), so it needs its own
+# entry rather than being covered by *.jdx.dev.
+mise.run
+
+# Deliberately NOT listed:
+#   mise.en.dev - the documentation site (Cargo.toml `homepage`). It appears in
+#                 mise's error and warning strings, but mise never fetches it.
+#   github.com, objects.githubusercontent.com, release-assets.githubusercontent.com
+#               - mise's own binary and every GitHub-backed tool come from these;
+#                 all three are in Anthropic's default list.
+#   www.python.org - only the compile-from-source Python path uses it, via
+#                 pyenv's python-build definitions. claude/session-start.sh sets
+#                 MISE_PYTHON_COMPILE=false so the precompiled builds (GitHub
+#                 release assets, already covered) are the only path used. That
+#                 path could not work here anyway: it needs a `git clone` of
+#                 pyenv, which this environment's GitHub proxy rejects with 403.
