@@ -61,6 +61,7 @@ jobs:
       # checked too, rather than reported as an unresolved source.
     - name: Lint the shell scripts
       run: |
+        shellcheck --version
         shellcheck --external-sources \
           assert-environment.sh setup.sh go.sh mise/setup.sh claude/setup.sh \
           claude/session-start.sh network/discover.sh \
