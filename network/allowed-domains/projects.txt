@@ -1,0 +1,12 @@
+# Hosts that specific projects need, rather than anything this setup installs.
+#
+# These cannot be derived from any upstream list -- the source of truth is the
+# project's own build file. When a new project needs a repository, the honest
+# thing is to add it here with a pointer to the build file that declares it.
+
+# Declared as a <repository> in the pom.xml of projects that consume snapshot
+# builds straight from a git ref.
+jitpack.io
+
+# Maven Central is NOT listed: repo.maven.apache.org and repo1.maven.org are in
+# Anthropic's default list.

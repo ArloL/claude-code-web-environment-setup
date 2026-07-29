@@ -25,6 +25,15 @@ if [[ -f .go-version ]]; then
     idiomatic_tools+=(go)
 fi
 
+# Always use the precompiled CPython builds from astral-sh/python-build-standalone
+# (GitHub release assets, which the environment allows by default) instead of
+# compiling from source. The compile path pulls CPython tarballs from
+# www.python.org via a `git clone` of pyenv, and this environment's GitHub proxy
+# 403s that clone, so it can only ever fail -- better to fail loudly here than
+# to have `mise install python` silently fall back to it. See
+# network/allowed-domains/mise.txt.
+export MISE_PYTHON_COMPILE=false
+
 if [[ ${#idiomatic_tools[@]} -gt 0 ]]; then
     MISE_IDIOMATIC_VERSION_FILE_ENABLE_TOOLS="$(
         IFS=,
@@ -37,6 +46,8 @@ mise install
 
 {
     mise env --shell bash
+    # Keep the precompiled-Python pin for later `mise` calls in the session
+    echo "export MISE_PYTHON_COMPILE=false"
     # Keep the opt-in for later `mise` calls in the session, not just this hook
     if [[ -n "${MISE_IDIOMATIC_VERSION_FILE_ENABLE_TOOLS:-}" ]]; then
         echo "export MISE_IDIOMATIC_VERSION_FILE_ENABLE_TOOLS=\"${MISE_IDIOMATIC_VERSION_FILE_ENABLE_TOOLS}\""

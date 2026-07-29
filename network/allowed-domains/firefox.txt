@@ -1,0 +1,30 @@
+# Downloading Firefox itself (not Playwright's firefox build, which comes from
+# cdn.playwright.dev -- see playwright.txt).
+#
+# Source of truth for the redirect chain, re-checkable with:
+#   curl --head --location --user-agent "Mozilla/5.0 (X11; Linux x86_64)" \
+#     "https://download.mozilla.org/?product=firefox-latest-ssl&os=linux64&lang=en-US"
+# which returns a single 302 from download.mozilla.org to
+# download-installer.cdn.mozilla.net.
+
+# Bouncer, Mozilla's stable download endpoint that resolves "latest" for you.
+download.mozilla.org
+
+# The CDN that Bouncer's 302 points at, i.e. where the bytes come from.
+download-installer.cdn.mozilla.net
+
+# The documented Firefox version API, needed only to resolve an explicit
+# version rather than letting Bouncer pick latest:
+#   https://product-details.mozilla.org/1.0/firefox_versions.json
+# https://wiki.mozilla.org/Release_Management/Product_details
+product-details.mozilla.org
+
+# Release archive. Only needed when constructing archive URLs by hand
+# (https://archive.mozilla.org/pub/firefox/releases/<version>/...) instead of
+# going through Bouncer.
+archive.mozilla.org
+
+# Deliberately NOT listed:
+#   ftp.mozilla.org - the legacy name retired in Mozilla's 2015 archive
+#                     migration. It is the same origin as archive.mozilla.org;
+#                     both are CNAMEs for mozilla-download.fastly-edge.com.
