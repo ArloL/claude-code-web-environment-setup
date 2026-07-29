@@ -49,16 +49,24 @@ Create a new cloud environment:
     ```
     X_ENVIRONMENT_MINE=1
     ```
-   This one is load-bearing, not just a marker: the setup scripts refuse to run
-   without it. They install mise into `~/.local/bin` and overwrite
-   `~/.claude/settings.json`, which is fine on a throwaway VM and not fine on a
-   workstation, so running them is an explicit opt-in. See
+   The scripts refuse to run without it. They install mise into `~/.local/bin`
+   and overwrite `~/.claude/settings.json`, which is fine on a throwaway VM and
+   not fine on a workstation, so running them is an explicit opt-in. See
    [assert-environment.sh](assert-environment.sh).
+
+   These variables reach the *session*, which is what `claude/session-start.sh`
+   needs. They are **not** in scope while the setup script runs -- that happens
+   earlier, when the environment image is built -- so the setup script has to
+   export the marker itself.
 6. Setup script:
     ```
     #!/bin/bash
+    export X_ENVIRONMENT_MINE=1
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/ArloL/claude-code-web-environment-setup/HEAD/go.sh)"
     ```
+   The `export` is the opt-in the guard is looking for: it is inherited by
+   `go.sh` and everything below it. Copying just the `curl` line onto a
+   workstation still gets refused, which is the point.
 
 # Playwright
 
