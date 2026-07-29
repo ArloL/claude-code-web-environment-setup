@@ -10,7 +10,7 @@ set -o xtrace
 . "$(dirname "$0")/../assert-environment.sh"
 
 # renovate: datasource=github-releases depName=jdx/mise
-MISE_VERSION=2026.7.5
+MISE_VERSION=2026.7.16
 export MISE_VERSION
 
 # Download first, then run: a piped `curl ... | sh` would hide a failed
