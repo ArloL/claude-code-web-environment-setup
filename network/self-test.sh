@@ -133,6 +133,30 @@ echo "## No such heading" | python3 "${script_dir}/extract-claude-defaults.py" \
 check "the docs parser fails loudly when the layout changes" 1 $?
 set -o errexit
 
+# --- the renderer refuses a wildcard entry -----------------------------------
+# The docs promise a leading `*.` matches every subdomain, but the environment
+# did not honour it for an entry pasted into the field: mise.jdx.dev came back
+# 503 with `*.jdx.dev` on the list. A wildcard slipping back into
+# allowed-domains/ has to fail here rather than mid-session.
+mkdir -p "${work_dir}/wildcard-domains"
+echo '*.jdx.dev' > "${work_dir}/wildcard-domains/mise.txt"
+set +o errexit
+python3 - "${script_dir}" "${work_dir}/wildcard-domains" > /dev/null 2>&1 <<'EOF'
+import importlib.util
+import pathlib
+import sys
+
+spec = importlib.util.spec_from_file_location(
+    "build_allowed_domains", pathlib.Path(sys.argv[1]) / "build-allowed-domains.py"
+)
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+module.DOMAINS_DIR = pathlib.Path(sys.argv[2])
+module.collect_domains()
+EOF
+check "the renderer refuses a wildcard entry" 1 $?
+set -o errexit
+
 echo
 if [[ "${failures}" -gt 0 ]]; then
     echo "${failures} check(s) failed"

@@ -16,7 +16,6 @@ Create a new cloud environment:
    where every host is annotated with what needs it and how to re-derive it:
     <!-- BEGIN generated allowed-domains -->
     ```
-    *.jdx.dev
     archive.mozilla.org
     cdn.playwright.dev
     download-installer.cdn.mozilla.net
@@ -24,6 +23,9 @@ Create a new cloud environment:
     download.zigmirror.com
     fs.liujiacai.net
     jitpack.io
+    mise-java.jdx.dev
+    mise-versions.jdx.dev
+    mise.jdx.dev
     mise.run
     pkg.earth
     pkg.hexops.org

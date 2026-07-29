@@ -13,7 +13,7 @@ So the list is generated. The hosts live in [`allowed-domains/`](allowed-domains
 one file per thing that needs them, each host annotated with **what needs it**
 and **the upstream source of truth that can be re-checked**.
 
-## The three moves that shrink the list
+## The two moves that shrink the list
 
 **1. Let Anthropic's default list do the work.** Under *Custom* network access
 there is a checkbox, **Also include default list of common package managers**.
@@ -23,10 +23,7 @@ Those need no entry here. `claude-defaults.txt` is a generated copy of that
 list, and `build-allowed-domains.py --check` fails if any of our entries have
 become redundant with it.
 
-**2. Use wildcards.** A leading `*.` matches any subdomain, so `*.jdx.dev`
-replaces `mise.jdx.dev`, `mise-versions.jdx.dev` and `mise-java.jdx.dev`.
-
-**3. Poll the lists that move on their own.** Zig's community mirrors and
+**2. Poll the lists that move on their own.** Zig's community mirrors and
 Anthropic's defaults both change without anything in this repo changing.
 `refresh-sources.sh` fetches them, and the monthly workflow opens a pull request
 when they differ.
@@ -99,6 +96,21 @@ was blocked.
 entries: the real list treats `jdx.dev` and `mise.jdx.dev` as different hosts,
 and a proxy that was more permissive than production would certify lists that
 then fail in production.
+
+## Wildcards do not work, whatever the docs say
+
+The docs promise that a leading `*.` in the **Allowed domains** field matches
+every subdomain ([Allow specific domains](https://code.claude.com/docs/en/cloud-environments#allow-specific-domains)),
+and Anthropic's own default list uses `*.googleapis.com`, `*.gcr.io` and
+`*.ubuntu.com`. It was tried here and it does not hold for entries we paste in:
+with `*.jdx.dev` as the only `jdx.dev` entry, `https://mise.jdx.dev/install.sh`
+came back 503, which reached the user as `mise installation failed` from
+`mise.run`'s installer — that installer pipes the 503 into `sh`, so an empty
+script runs successfully and the real error is two steps removed from the
+symptom. `mise.run`, a bare entry on the same list, worked in the same run.
+
+So every host in `allowed-domains/` is exact. If a `*.` entry ever looks like it
+would shrink the list, that is the trap this section exists to stop.
 
 ## What this does not solve
 

@@ -44,12 +44,25 @@ def read_domain_file(path):
 
 
 def collect_domains():
-    """Return every domain across the per-source files, sorted and unique."""
+    """Return every domain across the per-source files, sorted and unique.
+
+    Rejects `*.` entries. The docs say a leading `*.` matches every subdomain,
+    but a pasted `*.jdx.dev` did not: mise.jdx.dev still came back 503. See
+    "Wildcards do not work, whatever the docs say" in network/README.md.
+    """
     if not DOMAINS_DIR.is_dir():
         raise SystemExit(f"build-allowed-domains: missing {DOMAINS_DIR}")
     domains = set()
     for path in sorted(DOMAINS_DIR.glob("*.txt")):
-        domains.update(read_domain_file(path))
+        for domain in read_domain_file(path):
+            if domain.startswith("*."):
+                raise SystemExit(
+                    f"build-allowed-domains: {path.name} has the wildcard "
+                    f"entry {domain}. The environment does not honour "
+                    f"wildcards in a pasted list -- write out the exact "
+                    f"hosts. See network/README.md."
+                )
+            domains.add(domain)
     if not domains:
         raise SystemExit(
             f"build-allowed-domains: no domains found in {DOMAINS_DIR}"
@@ -66,8 +79,9 @@ def load_defaults():
 def covered_by(domain, allowlist):
     """Return the allowlist entry that makes `domain` reachable, or None.
 
-    Mirrors the documented UI semantics: entries match exactly, except a
-    leading `*.` which matches any subdomain.
+    Only ever called with Anthropic's default list, where the `*.` entries do
+    work -- they are built into the environment rather than pasted into the
+    field, and a pasted `*.` does not match (see collect_domains).
     """
     for entry in allowlist:
         if entry == domain:
