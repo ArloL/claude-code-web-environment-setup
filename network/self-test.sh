@@ -20,6 +20,7 @@ script_dir="$(cd "$(dirname "$0")" && pwd)"
 work_dir="$(mktemp -d)"
 server_pid=""
 
+# shellcheck disable=SC2329,SC2317  # invoked indirectly by the EXIT trap
 cleanup() {
     if [[ -n "${server_pid}" ]] && kill -0 "${server_pid}" 2>/dev/null; then
         kill -TERM "${server_pid}" 2>/dev/null || true

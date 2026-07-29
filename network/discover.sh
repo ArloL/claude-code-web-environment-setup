@@ -88,7 +88,10 @@ work_dir="$(mktemp -d)"
 hosts_file="${output:-${work_dir}/hosts.txt}"
 proxy_pid=""
 
-# shellcheck disable=SC2329  # invoked indirectly by the EXIT trap below
+# Invoked indirectly by the EXIT trap below. Which code fires for that
+# depends on the shellcheck version -- SC2329 on the function locally,
+# SC2317 on the body in CI -- so silence both.
+# shellcheck disable=SC2329,SC2317
 cleanup() {
     if [[ -n "${proxy_pid}" ]] && kill -0 "${proxy_pid}" 2>/dev/null; then
         kill -TERM "${proxy_pid}" 2>/dev/null || true
