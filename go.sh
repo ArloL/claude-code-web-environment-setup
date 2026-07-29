@@ -4,6 +4,17 @@ set -o errexit
 set -o nounset
 set -o xtrace
 
+# Inlined rather than sourcing assert-environment.sh: this script is fetched
+# with curl and piped to a shell, so the repo does not exist yet. Keep it in
+# step with assert-environment.sh.
+if [ "${X_ENVIRONMENT_MINE:-}" != "1" ]; then
+    echo "go.sh: refusing to run: X_ENVIRONMENT_MINE is not set to 1." >&2
+    echo "go.sh: this script is only for the Claude Code web environment --" >&2
+    echo "go.sh: it installs tools into \$HOME and overwrites" >&2
+    echo "go.sh: ~/.claude/settings.json." >&2
+    exit 1
+fi
+
 cat /etc/os-release
 set
 

@@ -49,6 +49,11 @@ Create a new cloud environment:
     ```
     X_ENVIRONMENT_MINE=1
     ```
+   This one is load-bearing, not just a marker: the setup scripts refuse to run
+   without it. They install mise into `~/.local/bin` and overwrite
+   `~/.claude/settings.json`, which is fine on a throwaway VM and not fine on a
+   workstation, so running them is an explicit opt-in. See
+   [assert-environment.sh](assert-environment.sh).
 6. Setup script:
     ```
     #!/bin/bash

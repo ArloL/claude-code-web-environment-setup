@@ -4,6 +4,11 @@ set -o errexit
 set -o nounset
 set -o xtrace
 
+# Each script guards itself rather than trusting its caller: they are all
+# runnable on their own, and this one installs mise into ~/.local/bin.
+# shellcheck source=SCRIPTDIR/../assert-environment.sh
+. "$(dirname "$0")/../assert-environment.sh"
+
 # renovate: datasource=github-releases depName=jdx/mise
 MISE_VERSION=2026.7.5
 export MISE_VERSION

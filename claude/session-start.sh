@@ -3,6 +3,16 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+# Unlike the setup scripts, this one skips instead of failing. It is a
+# SessionStart hook, so a non-zero exit would surface an error at the start of
+# every session, and the things it configures (the mise environment, the Maven
+# proxy) are meaningless anywhere else. claude/setup.sh only installs the hook
+# inside the environment, so in practice this never trips.
+if [[ "${X_ENVIRONMENT_MINE:-}" != "1" ]]; then
+    echo "session-start.sh: not the Claude Code web environment, skipping."
+    exit 0
+fi
+
 cd "${CLAUDE_PROJECT_DIR}"
 
 # mise ignores idiomatic version files (.python-version, .nvmrc, ...) unless the
