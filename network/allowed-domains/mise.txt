@@ -10,17 +10,30 @@
 # settings.toml in that repo is the machine-readable file for URL-valued
 # defaults ([python.pyenv_repo], [go.download_mirror], ...).
 
-# One wildcard instead of three exact hosts. What is actually behind it:
-#   mise.jdx.dev          - install.sh, registry/latest.tar.zst (src/registry.rs),
-#                           VERSION for the update check (src/cli/version.rs)
-#   mise-versions.jdx.dev - version/release/attestation API (src/versions_host.rs)
-#                           and the precompiled-CPython index (src/plugins/core/python.rs)
-#   mise-java.jdx.dev     - JVM metadata index (src/plugins/core/java.rs)
-*.jdx.dev
+# Three exact hosts rather than one `*.jdx.dev` wildcard. The wildcard was
+# tried and does not work: with `*.jdx.dev` as the only jdx.dev entry, the
+# proxy still answered 503 for mise.jdx.dev, which surfaced as mise.run's
+# `curl -fsSL https://mise.jdx.dev/install.sh | sh` producing an empty script
+# and then "mise installation failed". The docs say a leading `*.` matches
+# every subdomain (code.claude.com/docs/en/cloud-environments, "Allow specific
+# domains"), so this contradicts them -- but the observed behaviour is what the
+# list has to match. Keep these exact, and do not re-collapse them.
+#
+# install.sh, registry/latest.tar.zst (src/registry.rs), VERSION for the update
+# check (src/cli/version.rs), and the version tarballs when MISE_VERSION is the
+# one install.sh was built for.
+mise.jdx.dev
+
+# Version/release/attestation API (src/versions_host.rs) and the precompiled-
+# CPython index (src/plugins/core/python.rs).
+mise-versions.jdx.dev
+
+# JVM metadata index (src/plugins/core/java.rs).
+mise-java.jdx.dev
 
 # Serves mise/setup.sh's install script. A Cloudflare Worker that proxies
 # mise.jdx.dev server-side (cloudflare/workers/mise-run.js), so it needs its own
-# entry rather than being covered by *.jdx.dev.
+# entry rather than being covered by the jdx.dev hosts above.
 mise.run
 
 # Deliberately NOT listed:
