@@ -18,6 +18,7 @@ Create a new cloud environment:
     ```
     *.jdx.dev
     archive.mozilla.org
+    cdn.playwright.dev
     download-installer.cdn.mozilla.net
     download.mozilla.org
     download.zigmirror.com
@@ -26,6 +27,7 @@ Create a new cloud environment:
     mise.run
     pkg.earth
     pkg.hexops.org
+    playwright.download.prss.microsoft.com
     product-details.mozilla.org
     zig-mirror.tsimnet.eu
     zig.bcr.ist
@@ -52,6 +54,30 @@ Create a new cloud environment:
     #!/bin/bash
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/ArloL/claude-code-web-environment-setup/HEAD/go.sh)"
     ```
+
+# Playwright
+
+Browsers are not preinstalled — they are ~500 MB and tied to the Playwright
+version a given project pins, so a project installs its own:
+
+```sh
+npx playwright install chromium
+```
+
+Verified to need only `cdn.playwright.dev` and
+`playwright.download.prss.microsoft.com` beyond the defaults; see
+[network/allowed-domains/playwright.txt](network/allowed-domains/playwright.txt).
+
+Two things that are not covered by the allowed-domains list:
+
+- `npx playwright install --with-deps` installs system libraries with `apt-get`
+  and re-runs itself under `sudo`. The Ubuntu apt hosts are in Anthropic's
+  default list, but Playwright does not forward proxy environment variables
+  across that `sudo`, so if it fails, run
+  `sudo HTTPS_PROXY="${HTTPS_PROXY}" npx playwright install-deps` instead.
+- `npx playwright install chrome` installs branded Google Chrome from
+  `dl.google.com`, which is *not* allowed. Use `chromium` unless a project
+  specifically needs the branded build.
 
 # Network access
 

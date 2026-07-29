@@ -1,0 +1,36 @@
+# Playwright browser downloads (`npx playwright install`).
+#
+# Upstream source of truth -- the mirror list is a constant in the installer:
+# https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/registry/index.ts
+#   const PLAYWRIGHT_CDN_MIRRORS = [
+#     'https://cdn.playwright.dev/dbazure/download/playwright',                     # ESRP CDN
+#     'https://playwright.download.prss.microsoft.com/dbazure/download/playwright', # directly hit ESRP CDN
+#     'https://cdn.playwright.dev',                                                 # storage bucket directly
+#   ];
+# Chrome-for-Testing builds use a separate single-mirror path (`cftUrl`) whose
+# only mirror is cdn.playwright.dev.
+#
+# Verified empirically with `network/discover.sh -- npx playwright install
+# chromium firefox webkit` (Playwright 1.62.0), which contacted exactly:
+# cdn.playwright.dev, playwright.download.prss.microsoft.com, and
+# storage.googleapis.com.
+
+# Entry point for every browser archive, and the sole mirror for the
+# Chrome-for-Testing chromium and chromium-headless-shell builds.
+cdn.playwright.dev
+
+# Where cdn.playwright.dev 307-redirects the firefox, webkit and ffmpeg
+# archives. The installer follows redirects (packages/utils/network.ts), so the
+# redirect target has to be reachable too. Installs do survive without it --
+# mirror 3 serves the bucket directly -- but every download burns two failed
+# attempts first.
+playwright.download.prss.microsoft.com
+
+# NOT listed here, because Anthropic's default list already covers them:
+#   storage.googleapis.com     - 307 target for the Chrome-for-Testing builds
+#   registry.npmjs.org         - the `playwright` package itself
+#   pypi.org, files.pythonhosted.org - the Python port
+#   archive.ubuntu.com, security.ubuntu.com, *.ubuntu.com
+#                              - apt hosts for `playwright install --with-deps`
+#   dl.google.com is NOT covered; `playwright install chrome` (branded Chrome,
+#   as opposed to `chromium`) would need it added.
