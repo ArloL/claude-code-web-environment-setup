@@ -57,6 +57,18 @@ jobs:
       run: sh setup.sh
     - name: Make sure build did not change anything
       run: git diff --exit-code
+      # --external-sources so the assert-environment.sh guard is followed and
+      # checked too, rather than reported as an unresolved source.
+    - name: Lint the shell scripts
+      run: |
+        shellcheck --external-sources \
+          assert-environment.sh setup.sh go.sh mise/setup.sh claude/setup.sh \
+          claude/session-start.sh network/discover.sh \
+          network/refresh-sources.sh network/self-test.sh
+    - name: Check the allowed-domains list is current and non-redundant
+      run: python3 network/build-allowed-domains.py --check
+    - name: Check the host-discovery tooling works
+      run: bash network/self-test.sh
   required-status-check:
     name: pr-check.required-status-check
     needs:
