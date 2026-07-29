@@ -47,7 +47,14 @@ jobs:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         persist-credentials: false
-    - run: sh setup.sh
+      # The setup scripts refuse to run unless this is set, so that they cannot
+      # be run by accident on a real machine. A throwaway runner is one of the
+      # two places they are meant to run, so opt in explicitly. See
+      # assert-environment.sh.
+    - name: Run the setup scripts
+      env:
+        X_ENVIRONMENT_MINE: 1
+      run: sh setup.sh
     - name: Make sure build did not change anything
       run: git diff --exit-code
   required-status-check:
