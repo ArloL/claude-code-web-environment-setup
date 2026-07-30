@@ -64,7 +64,7 @@ jobs:
         shellcheck --version
         shellcheck --external-sources \
           assert-environment.sh setup.sh go.sh mise/setup.sh claude/setup.sh \
-          claude/session-start.sh network/discover.sh \
+          claude/session-start.sh claude/docker.sh network/discover.sh \
           network/refresh-sources.sh network/self-test.sh
     - name: Check the allowed-domains list is current and non-redundant
       run: python3 network/build-allowed-domains.py --check

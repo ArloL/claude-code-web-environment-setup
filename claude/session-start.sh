@@ -72,3 +72,8 @@ source "${CLAUDE_ENV_FILE}"
 
 echo "Configuring Maven proxy..."
 python3 "${HOME}/arlo-setup/claude/configure-maven-proxy.py"
+
+# Nothing starts dockerd in this environment, so Testcontainers has no Docker to
+# find. Invoked with `bash` rather than executed, so it works even if the
+# tarball loses the mode bit.
+bash "${HOME}/arlo-setup/claude/docker.sh"
