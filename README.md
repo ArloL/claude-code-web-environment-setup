@@ -125,6 +125,9 @@ defaults:
 
 ```sh
 echo '{"registry-mirrors": ["https://mirror.gcr.io"]}' | sudo tee /etc/docker/daemon.json
+# dockerd only reads that file at startup, and the SessionStart hook already
+# started it -- so restart it, or the mirror is configured and unused.
+sudo pkill dockerd && bash "${HOME}/arlo-setup/claude/docker.sh"
 ```
 
 That covers Docker Hub only, and `dockerd` falls back to Hub when the mirror
