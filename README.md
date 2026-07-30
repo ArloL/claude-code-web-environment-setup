@@ -31,6 +31,7 @@ Create a new cloud environment:
     pkg.hexops.org
     playwright.download.prss.microsoft.com
     product-details.mozilla.org
+    registry.terraform.io
     zig-mirror.tsimnet.eu
     zig.bcr.ist
     zig.chainsafe.dev
