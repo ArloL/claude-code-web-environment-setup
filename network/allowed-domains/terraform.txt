@@ -1,0 +1,24 @@
+# Terraform. `terraform validate` refuses to run until `terraform init` has
+# installed the configuration's providers, so validating needs the registry
+# even though validation itself is offline: with the providers already in
+# .terraform/, `discover.sh -- terraform validate` contacts no host at all.
+
+# The provider registry every `source = "hashicorp/null"`-style address
+# resolves to, since an address without an explicit hostname gets this one:
+# DefaultProviderRegistryHost in hashicorp/terraform-registry-address's
+# provider.go, re-exported as internal/addrs/provider.go's constant of the same
+# name. It answers the version query ("Finding hashicorp/null versions
+# matching ...") and hands back the download URL for the zip.
+registry.terraform.io
+
+# Deliberately NOT listed:
+#   releases.hashicorp.com - where registry.terraform.io points for the
+#               HashiCorp-published provider zips, and where mise's terraform
+#               backend gets terraform itself. Both were observed, and both are
+#               covered: it is in Anthropic's default list.
+#   github.com, objects.githubusercontent.com, release-assets.githubusercontent.com
+#               - third-party providers publish their zips as GitHub release
+#               assets, and the registry redirects there. All in the defaults.
+#   checkpoint-api.hashicorp.com - HashiCorp's version-check service. `terraform
+#               version` calls it; `init` and `validate` do not, so nothing here
+#               needs it. CHECKPOINT_DISABLE=1 turns it off if it ever surfaces.
