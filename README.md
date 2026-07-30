@@ -31,6 +31,7 @@ Create a new cloud environment:
     pkg.hexops.org
     playwright.download.prss.microsoft.com
     product-details.mozilla.org
+    production.cloudfront.docker.com
     registry.terraform.io
     zig-mirror.tsimnet.eu
     zig.bcr.ist
@@ -94,6 +95,44 @@ Two things that are not covered by the allowed-domains list:
 - `npx playwright install chrome` installs branded Google Chrome from
   `dl.google.com`, which is *not* allowed. Use `chromium` unless a project
   specifically needs the branded build.
+
+# Docker and Testcontainers
+
+Out of the box, a Testcontainers suite fails here twice over, and neither
+failure names its own cause.
+
+**The daemon is not running.** The image has the whole Docker stack — CLI,
+`dockerd`, `containerd`, `runc`, and a `docker.service` unit — but PID 1 is the
+session supervisor, not systemd, so nothing starts it. There is no
+`/var/run/docker.sock`, and Testcontainers reports `Could not find a valid
+Docker environment`, which sounds like Docker is missing rather than merely
+unstarted. [`claude/docker.sh`](claude/docker.sh), run from the SessionStart
+hook, starts it and waits for the socket. It needs no proxy or CA setup: egress
+is intercepted transparently, so `dockerd` behaves identically with and without
+`HTTPS_PROXY`.
+
+**Docker Hub's blob CDN is not on the allowed-domains list.** The registry
+hosts are in Anthropic's defaults, so a pull authenticates and resolves the
+manifest before dying on the layers. The default list has a *stale* CDN entry —
+`production.cloudflare.docker.com` — while Hub now redirects blobs to
+`production.cloudfront.docker.com`. Hence
+[network/allowed-domains/docker.txt](network/allowed-domains/docker.txt), which
+is why that host appears in the list above.
+
+Until that host is pasted into the environment's **Allowed domains**, a
+pull-through cache is the stopgap, because `*.gcr.io` is already in Anthropic's
+defaults:
+
+```sh
+echo '{"registry-mirrors": ["https://mirror.gcr.io"]}' | sudo tee /etc/docker/daemon.json
+```
+
+That covers Docker Hub only, and `dockerd` falls back to Hub when the mirror
+does not have an image — which then hits the blocked host again. Prefer fixing
+the list.
+
+`quay.io` and `registry.k8s.io` are both blocked and are not in
+`allowed-domains/`; a project pulling from either needs them added.
 
 # Network access
 

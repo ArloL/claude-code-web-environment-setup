@@ -1,0 +1,47 @@
+# Docker Hub image pulls -- `docker pull`, and so every Testcontainers test.
+#
+# Anthropic's default list already covers the registry itself: auth.docker.io
+# (tokens), registry-1.docker.io and index.docker.io (manifests). So a pull gets
+# a token, resolves the manifest, starts the layers, and only then fails. The
+# symptom is a download that dies part way through rather than anything that
+# names a blocked host, which is why this took a while to pin down.
+#
+# The default list does carry a Docker Hub CDN entry -- but it is
+# production.cloudflare.docker.com, and Hub no longer serves blobs from there.
+# The redirect target is now production.cloudfront.docker.com: CloudFront, not
+# Cloudflare. One letter apart, different host, and the entry below is therefore
+# not redundant with the default list. If Anthropic's defaults ever catch up,
+# `build-allowed-domains.py --check` will say so and this file can go.
+#
+# Measured, not inferred. In the environment (Docker Engine 29.3.1) `docker pull`
+# reported:
+#
+#   failed to copy: httpReadSeeker: failed open: unexpected status from GET
+#   request to https://production.cloudfront.docker.com/registry-v2/docker/
+#   registry/v2/blobs/sha256/bf/bf8527.../data?Expires=...: 403 Forbidden
+#
+# and the egress proxy's own log recorded the matching denial:
+#
+#   {"kind": "connect_rejected", "host": "production.cloudfront.docker.com:443",
+#    "detail": "gateway answered 403 to CONNECT (policy denial ...)"}
+#
+# Pulls of alpine:3.20 and selenium/standalone-chromium both redirected to this
+# same single host, so unlike the Zig mirrors it shows no sign of rotating. Two
+# images is not proof; if a pull ever fails on some other *.docker.com host, add
+# it here rather than assuming this one line is the whole story.
+#
+# network/discover.sh is no help for this one, in either direction: inside the
+# environment its proxy dials hosts directly and a blocked host answers 403
+# before any of its logging matters, and outside the environment nothing is
+# blocked at all. The two quotes above are the measurement.
+
+# Where registry-1.docker.io redirects layer blobs.
+production.cloudfront.docker.com
+
+# NOT listed here, because Anthropic's default list already covers them:
+#   registry-1.docker.io, index.docker.io - manifests
+#   auth.docker.io                        - pull tokens
+#   *.gcr.io                              - covers mirror.gcr.io, the Docker Hub
+#                                           pull-through cache (see README.md)
+# NOT listed, because nothing here needs them yet: quay.io and registry.k8s.io
+# are both blocked. A project pulling images from either has to add them.
