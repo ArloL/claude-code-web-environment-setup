@@ -6,7 +6,7 @@ set -o pipefail
 # Unlike the setup scripts, this one skips instead of failing. It is a
 # SessionStart hook, so a non-zero exit would surface an error at the start of
 # every session, and the things it configures (the mise environment, the Maven
-# proxy) are meaningless anywhere else. claude/setup.sh only installs the hook
+# settings) are meaningless anywhere else. claude/setup.sh only installs the hook
 # inside the environment, so in practice this never trips.
 if [[ "${X_ENVIRONMENT_MINE:-}" != "1" ]]; then
     echo "session-start.sh: not the Claude Code web environment, skipping."
@@ -70,8 +70,8 @@ mise install
 # shellcheck disable=SC1090
 source "${CLAUDE_ENV_FILE}"
 
-echo "Configuring Maven proxy..."
-python3 "${HOME}/arlo-setup/claude/configure-maven-proxy.py"
+echo "Configuring Maven..."
+python3 "${HOME}/arlo-setup/claude/configure-maven.py"
 
 # Nothing starts dockerd in this environment, so Testcontainers has no Docker to
 # find. Invoked with `bash` rather than executed, so it works even if the
