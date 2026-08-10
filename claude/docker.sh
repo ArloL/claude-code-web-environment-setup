@@ -25,9 +25,18 @@
 # non-zero exit would put an error at the top of every session, and a project
 # that does not use containers should not care that the daemon did not come up.
 # Hence no `errexit` and the unconditional `exit 0` at the end.
+#
+# Safe to run more than once, and claude/ensure-docker.sh does exactly that: it
+# runs this script again from a PreToolUse hook when the daemon is missing at
+# the moment a shell command runs, which is the case the SessionStart hook alone
+# does not cover.
+#
+# DOCKER_WAIT_SECONDS caps how long to wait for the socket (default 60).
 
 set -o nounset
 set -o pipefail
+
+wait_seconds="${DOCKER_WAIT_SECONDS:-60}"
 
 say() {
     echo "docker.sh: $*"
@@ -62,7 +71,7 @@ setsid dockerd > "${log_file}" 2>&1 < /dev/null &
 # Poll rather than sleep a fixed amount. Testcontainers may be the very next
 # thing that runs, so returning before the socket accepts connections would just
 # move the failure.
-for _ in $(seq 1 60); do
+for _ in $(seq 1 "${wait_seconds}"); do
     if docker info > /dev/null 2>&1; then
         say "daemon ready."
         exit 0
@@ -70,6 +79,6 @@ for _ in $(seq 1 60); do
     sleep 1
 done
 
-say "daemon did not come up within 60s; last lines of ${log_file}:" >&2
+say "daemon did not come up within ${wait_seconds}s; last lines of ${log_file}:" >&2
 tail -n 20 "${log_file}" >&2 || true
 exit 0
