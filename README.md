@@ -72,6 +72,18 @@ Create a new cloud environment:
    `go.sh` and everything below it. Copying just the `curl` line onto a
    workstation still gets refused, which is the point.
 
+The setup script runs when the environment image is built, and *only* then — a
+later session boots straight past it ("Fast resume: Environment already
+configured — Skipping initialization script for faster startup"). So an existing
+environment keeps running whatever revision of this repo it was built against,
+however long ago that was: `~/arlo-setup` is a snapshot, not a checkout. Changes
+here reach an environment when it is rebuilt. To pick them up in a session
+already running:
+
+```sh
+X_ENVIRONMENT_MINE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/ArloL/claude-code-web-environment-setup/HEAD/go.sh)"
+```
+
 # Playwright
 
 Browsers are not preinstalled — they are ~500 MB and tied to the Playwright
@@ -111,6 +123,23 @@ hook, starts it and waits for the socket. It needs no proxy or CA setup: egress
 is intercepted transparently, so `dockerd` behaves identically with and without
 `HTTPS_PROXY`.
 
+Starting it once per session start is not enough, though. A resumed session gets
+a *new* container — the old one is reclaimed, and the daemon dies with it —
+without necessarily getting a fresh SessionStart to put it back, and a daemon
+that dies mid-session is never restarted either way. Both look the same from
+inside: `Could not find a valid Docker environment`, in a session whose startup
+output said `daemon ready` about a container that no longer exists. So
+[`claude/ensure-docker.sh`](claude/ensure-docker.sh) also runs from a PreToolUse
+hook on `Bash` and asks the question where it matters — right before a shell
+command runs. It is a single `pgrep` when the daemon is up, and it retries the
+expensive path at most once per boot for as long as starting keeps failing, so
+an image without a working `dockerd` does not make every command wait.
+
+`claude/docker.sh` runs *first* in the SessionStart hook, ahead of the mise and
+Maven work, because it depends on none of it: running it last meant any earlier
+failure took Docker down with it, under a name that pointed nowhere near the
+real cause.
+
 **Docker Hub's blob CDN is not on the allowed-domains list.** The registry
 hosts are in Anthropic's defaults, so a pull authenticates and resolves the
 manifest before dying on the layers. The default list has a *stale* CDN entry —
@@ -125,8 +154,8 @@ defaults:
 
 ```sh
 echo '{"registry-mirrors": ["https://mirror.gcr.io"]}' | sudo tee /etc/docker/daemon.json
-# dockerd only reads that file at startup, and the SessionStart hook already
-# started it -- so restart it, or the mirror is configured and unused.
+# dockerd only reads that file at startup, and the session already started it
+# -- so restart it, or the mirror is configured and unused.
 sudo pkill dockerd && bash "${HOME}/arlo-setup/claude/docker.sh"
 ```
 
