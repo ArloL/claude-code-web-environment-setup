@@ -47,21 +47,21 @@ jobs:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         persist-credentials: false
-      # The setup scripts refuse to run unless this is set, so that they cannot
-      # be run by accident on a real machine. A throwaway runner is one of the
-      # two places they are meant to run, so opt in explicitly. See
-      # assert-environment.sh.
     - name: Run the setup scripts
       env:
+        # The setup scripts refuse to run unless this is set, so that they cannot
+        # be run by accident on a real machine. A throwaway runner is one of the
+        # two places they are meant to run, so opt in explicitly. See
+        # assert-environment.sh.
         X_ENVIRONMENT_MINE: 1
       run: sh setup.sh
     - name: Make sure build did not change anything
       run: git diff --exit-code
-      # --external-sources so the assert-environment.sh guard is followed and
-      # checked too, rather than reported as an unresolved source.
     - name: Lint the shell scripts
       run: |
         shellcheck --version
+        # --external-sources so the assert-environment.sh guard is followed and
+        # checked too, rather than reported as an unresolved source.
         shellcheck --external-sources \
           assert-environment.sh setup.sh go.sh mise/setup.sh claude/setup.sh \
           claude/session-start.sh claude/docker.sh claude/ensure-docker.sh \
