@@ -15,5 +15,12 @@ jitpack.io
 # Source of truth: https://github.com/ArloL/arlol.github.io
 arlol.github.io
 
+# zizmor's documentation site. Every zizmor finding is reported with a
+# docs.zizmor.sh/audits/#<id> link and the audit rules only exist there, so
+# fixing what the zizmor job reports means fetching that page.
+# Source of truth: the `uvx zizmor` step in
+# .github/workflows/check-actions.yaml, and https://github.com/zizmorcore/zizmor
+docs.zizmor.sh
+
 # Maven Central is NOT listed: repo.maven.apache.org and repo1.maven.org are in
 # Anthropic's default list.
