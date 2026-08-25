@@ -17,6 +17,7 @@ Create a new cloud environment:
     <!-- BEGIN generated allowed-domains -->
     ```
     archive.mozilla.org
+    arlol.github.io
     cdn.playwright.dev
     download-installer.cdn.mozilla.net
     download.mozilla.org
