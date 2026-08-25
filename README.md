@@ -19,6 +19,7 @@ Create a new cloud environment:
     archive.mozilla.org
     arlol.github.io
     cdn.playwright.dev
+    docs.zizmor.sh
     download-installer.cdn.mozilla.net
     download.mozilla.org
     download.zigmirror.com
