@@ -8,5 +8,12 @@
 # builds straight from a git ref.
 jitpack.io
 
+# The published GitHub Pages site of ArloL/arlol.github.io. Reaching the
+# deployed page needs the github.io host: github.com and
+# raw.githubusercontent.com are in Anthropic's default list, but the host that
+# serves the built site is not.
+# Source of truth: https://github.com/ArloL/arlol.github.io
+arlol.github.io
+
 # Maven Central is NOT listed: repo.maven.apache.org and repo1.maven.org are in
 # Anthropic's default list.
