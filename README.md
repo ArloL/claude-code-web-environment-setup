@@ -35,6 +35,7 @@ Create a new cloud environment:
     product-details.mozilla.org
     production.cloudfront.docker.com
     registry.terraform.io
+    sonarcloud.io
     zig-mirror.tsimnet.eu
     zig.bcr.ist
     zig.chainsafe.dev
