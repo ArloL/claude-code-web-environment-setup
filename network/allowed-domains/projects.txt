@@ -22,5 +22,16 @@ arlol.github.io
 # .github/workflows/check-actions.yaml, and https://github.com/zizmorcore/zizmor
 docs.zizmor.sh
 
+# SonarCloud (SonarQube Cloud). The analysis of a pull request lives only there:
+# the workflow uploads it and GitHub shows a link, so reading what the scan found
+# means fetching sonarcloud.io/api/issues/search?componentKeys=<key>. The web UI
+# on the same host is a JavaScript app and returns no findings to a fetch; the
+# API answers anonymously for public projects.
+# Source of truth: the SONAR_HOST_URL of the SonarSource/sonarqube-scan-action
+# step in https://github.com/ArloL/configurable-containers
+# .github/workflows/sonarcloud.yaml, and the <sonar.host.url> in
+# https://github.com/ArloL/drifty pom.xml
+sonarcloud.io
+
 # Maven Central is NOT listed: repo.maven.apache.org and repo1.maven.org are in
 # Anthropic's default list.
