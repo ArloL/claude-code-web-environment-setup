@@ -1,6 +1,7 @@
-# Reading Mozilla's source and bug data. Separate from firefox.txt, which is
-# about downloading the browser: nothing here is installed or built, these are
-# the two hosts that answer questions about Firefox's code and its bugs.
+# Reading Mozilla's source, bugs and documentation. Separate from firefox.txt,
+# which is about downloading the browser: nothing here is installed or built,
+# these are the hosts that answer questions about Firefox's code, its bugs and
+# how its platform is documented.
 
 # Searchfox, the indexed cross-reference of mozilla-central. There is no mirror
 # and no API on another host: both the search endpoint
@@ -18,6 +19,23 @@ searchfox.org
 # Source of truth: https://bmo.readthedocs.io/en/latest/api/ and
 # https://github.com/mozilla-bteam/bmo
 bugzilla.mozilla.org
+
+# MDN. The reference for what the web platform actually does -- and, unlike
+# the two above, the one host here that is not Mozilla-project-specific: an
+# answer about a DOM API, an HTTP header or a CSS property is checked against
+# developer.mozilla.org rather than recalled. The rendered docs and the JSON
+# behind them (append /index.json to any docs URL) are both on this host.
+# Source of truth: https://github.com/mdn/content, whose build is deployed to
+# developer.mozilla.org.
+developer.mozilla.org
+
+# The Mozilla wiki. Release process, project and platform pages that exist
+# nowhere else -- this repo already depends on one of them: firefox.txt cites
+# https://wiki.mozilla.org/Release_Management/Product_details as the source of
+# truth for the Firefox version API, and that page could not be opened from a
+# session until now.
+# Source of truth: the wiki itself; it is the primary document, not a mirror.
+wiki.mozilla.org
 
 # Not listed, and not an oversight: raw attachment downloads from BMO are
 # redirected to a per-attachment host under bmoattachments.org, so no exact

@@ -23,3 +23,10 @@ https://bugzilla.mozilla.org/rest/version
 # tree at all.
 https://searchfox.org/mozilla-central/source/
 
+# MDN. A page whose slug has been stable for years, so a 404 here means the
+# docs moved rather than that this probe picked a page someone renamed.
+https://developer.mozilla.org/en-US/docs/Web/HTTP
+
+# The Mozilla wiki, probed through the one page this repo already depends on:
+# firefox.txt cites it as the source of truth for the Firefox version API.
+https://wiki.mozilla.org/Release_Management/Product_details
