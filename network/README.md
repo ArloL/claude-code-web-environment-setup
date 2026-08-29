@@ -78,6 +78,41 @@ Step 3 is the one worth not skipping: it turns "I think that is all the hosts"
 into a command that exits non-zero if it is not. `discover.sh` fails if any host
 was blocked.
 
+## Checking the hosts still answer
+
+Everything above measures a host once, when it is added. What nothing here
+notices is the list going stale afterwards: an endpoint retired, a host moved
+behind a CDN, a redirect that grew a hop to a name nobody listed. In the
+environment that surfaces as a 503 in the middle of unrelated work, which is
+the debugging session this directory exists to prevent.
+
+So the claims are re-checked against the internet:
+
+```sh
+network/check-reachable.sh
+```
+
+Each line of [`probes.txt`](probes.txt) is one request that only succeeds if the
+thing a host is listed *for* is still being served — Bugzilla's `/rest/version`
+rather than its front page. Every probe is fetched through `hostlog-proxy` in
+enforce mode against the effective list, so it fails three ways: the request
+failed, it needed a host the list does not have, or it contacted a different set
+of hosts than the probe declares. That last one is the early warning — a new
+redirect hop shows up as a failing check here instead of a 503 later.
+
+A probe is a liveness check, not a feature test, and every run is traffic
+somebody else pays for. Prefer the cheapest endpoint that still proves the
+point.
+
+[`check-network-hosts.yaml`](../.github/workflows/check-network-hosts.yaml) runs
+it monthly and on any change under `network/`. It has no
+`required-status-check` job on purpose: it fails when a third party is down, and
+a Mozilla outage should not block merging an unrelated change. Red there means
+look at it, not do not merge.
+
+This says nothing about the **Allowed domains** field of any actual
+environment — only about the list in this repo. Pasting is still by hand.
+
 ## Files
 
 | | |
@@ -89,6 +124,8 @@ was blocked.
 | `build-allowed-domains.py` | renders the flat list, updates the README block, checks for staleness and redundancy. |
 | `refresh-sources.sh` | re-fetches the generated files from upstream, then re-renders. |
 | `discover.sh` | runs a command behind the logging proxy and reports the hosts it contacted. |
+| `check-reachable.sh` | fetches every probe and fails if a host stopped answering or a new one appeared. |
+| `probes.txt` | one request per host, each proving the endpoint it is listed for still works. |
 | `hostlog-proxy.py` | the proxy. Standard library only, so it also runs inside the environment. |
 | `extract-claude-defaults.py` | parses the default-domains section of the docs page. |
 

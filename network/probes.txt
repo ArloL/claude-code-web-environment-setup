@@ -1,0 +1,25 @@
+# Probe URLs for check-reachable.sh: one request per line that proves a host in
+# allowed-domains still answers, and that answering it does not pull in a host
+# the list does not have.
+#
+#     <url> [expected-host ...]
+#
+# The expected hosts default to the URL's own host. List more only when a probe
+# is meant to follow a redirect across hosts -- then the check fails if the
+# chain changes, which is the failure this file exists to catch early.
+#
+# A probe is a liveness check, not a feature test. Prefer the cheapest endpoint
+# that only works if the thing we actually use is still being served, and stay
+# off anything expensive enough that a monthly run would be rude.
+
+# Bugzilla@Mozilla. /rest/version is the REST API's own version endpoint: no
+# authentication, no bug number, and it answers only if the API that
+# mozilla-dev.txt is there for is up. Probing a specific bug instead would
+# couple this check to that bug staying public.
+https://bugzilla.mozilla.org/rest/version
+
+# Searchfox. The source view of mozilla-central, which is served only if the
+# index is built and mounted -- the root page alone would still render with no
+# tree at all.
+https://searchfox.org/mozilla-central/source/
+
