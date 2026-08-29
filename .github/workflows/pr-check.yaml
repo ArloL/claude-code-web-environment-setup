@@ -66,7 +66,7 @@ jobs:
           assert-environment.sh setup.sh go.sh mise/setup.sh claude/setup.sh \
           claude/plugins.sh \
           claude/session-start.sh claude/docker.sh claude/ensure-docker.sh \
-          network/discover.sh \
+          network/check-reachable.sh network/discover.sh \
           network/refresh-sources.sh network/self-test.sh
     - name: Check the allowed-domains list is current and non-redundant
       run: python3 network/build-allowed-domains.py --check

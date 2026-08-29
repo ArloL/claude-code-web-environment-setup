@@ -1,0 +1,47 @@
+name: Check network hosts
+
+# The allowed-domains list is a set of claims about the internet -- this host
+# answers, and reaching it needs nothing else. Those claims were true when they
+# were written, and nothing in this repo notices when they stop being true: a
+# host moves behind a CDN, an API endpoint is retired, a redirect grows a hop.
+# In the environment that surfaces as a 503 in the middle of unrelated work.
+#
+# pr-check.yaml deliberately stays offline -- it checks the list is rendered,
+# current and non-redundant, which is a question about files. Whether the hosts
+# answer is a question about the internet, so it lives here, where a run needs
+# real network access.
+#
+# There is no required-status-check job on purpose. This one fails when a third
+# party is down, and a Mozilla outage should not block merging an unrelated
+# change. A red run here means look at it, not do not merge.
+
+on:
+  push:
+    paths:
+    - network/**
+    - .github/workflows/check-network-hosts.yaml
+  pull_request:
+    branches:
+    - main
+    types:
+    - reopened
+    paths:
+    - network/**
+    - .github/workflows/check-network-hosts.yaml
+  schedule:
+  - cron: "17 6 5 * *"
+  workflow_dispatch:
+permissions: {}
+
+jobs:
+  reachable:
+    name: Probe the hosts in allowed-domains
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+    - name: Probe every host in network/probes.txt
+      run: bash network/check-reachable.sh
