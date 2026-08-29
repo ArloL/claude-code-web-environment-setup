@@ -18,6 +18,7 @@ Create a new cloud environment:
     ```
     archive.mozilla.org
     arlol.github.io
+    bugzilla.mozilla.org
     cdn.playwright.dev
     docs.zizmor.sh
     download-installer.cdn.mozilla.net
@@ -35,6 +36,7 @@ Create a new cloud environment:
     product-details.mozilla.org
     production.cloudfront.docker.com
     registry.terraform.io
+    searchfox.org
     sonarcloud.io
     zig-mirror.tsimnet.eu
     zig.bcr.ist

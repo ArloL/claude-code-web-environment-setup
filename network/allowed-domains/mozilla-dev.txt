@@ -1,0 +1,27 @@
+# Reading Mozilla's source and bug data. Separate from firefox.txt, which is
+# about downloading the browser: nothing here is installed or built, these are
+# the two hosts that answer questions about Firefox's code and its bugs.
+
+# Searchfox, the indexed cross-reference of mozilla-central. There is no mirror
+# and no API on another host: both the search endpoint
+# (searchfox.org/mozilla-central/search?q=...) and the rendered source pages
+# (searchfox.org/mozilla-central/source/<path>) are served from this one host.
+# Source of truth: https://github.com/mozsearch/mozsearch, whose deployment
+# serves searchfox.org.
+searchfox.org
+
+# Bugzilla@Mozilla. Bug reports, their comments and their patches live only
+# here, and the machine-readable form is on the same host:
+# bugzilla.mozilla.org/rest/bug/<id> and /rest/bug?quicksearch=... answer
+# anonymously for public bugs. The web UI needs JavaScript, so the REST API is
+# what a fetch can actually read.
+# Source of truth: https://bmo.readthedocs.io/en/latest/api/ and
+# https://github.com/mozilla-bteam/bmo
+bugzilla.mozilla.org
+
+# Not listed, and not an oversight: raw attachment downloads from BMO are
+# redirected to a per-attachment host under bmoattachments.org, so no exact
+# entry covers them and wildcards do not work here (see network/README.md).
+# Fetch attachment bytes through the REST API instead --
+# bugzilla.mozilla.org/rest/bug/<id>/attachment returns the data base64-encoded
+# from the host above.
