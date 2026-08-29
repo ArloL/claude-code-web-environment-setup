@@ -20,6 +20,7 @@ Create a new cloud environment:
     arlol.github.io
     bugzilla.mozilla.org
     cdn.playwright.dev
+    developer.mozilla.org
     docs.zizmor.sh
     download-installer.cdn.mozilla.net
     download.mozilla.org
@@ -38,6 +39,7 @@ Create a new cloud environment:
     registry.terraform.io
     searchfox.org
     sonarcloud.io
+    wiki.mozilla.org
     zig-mirror.tsimnet.eu
     zig.bcr.ist
     zig.chainsafe.dev
