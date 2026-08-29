@@ -28,9 +28,10 @@ curl --version
 # goes through the normal egress proxy. Requires codeload.github.com to be in
 # the environment's allowed domains.
 mkdir -p "${HOME}/arlo-setup"
-curl -fsSL \
+curl --fail --silent --show-error --location \
     https://codeload.github.com/ArloL/claude-code-web-environment-setup/tar.gz/refs/heads/main \
-    -o "${HOME}/arlo-setup.tgz"
-tar -xzf "${HOME}/arlo-setup.tgz" --strip-components=1 -C "${HOME}/arlo-setup"
+    --output "${HOME}/arlo-setup.tgz"
+tar --extract --gzip --file "${HOME}/arlo-setup.tgz" \
+    --strip-components=1 --directory "${HOME}/arlo-setup"
 
 sh "${HOME}/arlo-setup/setup.sh"
