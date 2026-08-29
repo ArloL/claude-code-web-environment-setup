@@ -11,6 +11,10 @@ cd "$(dirname "$0")" || exit 1
 # shellcheck source=SCRIPTDIR/../assert-environment.sh
 . ../assert-environment.sh
 
-mkdir --parents "${HOME}/.claude"
+mkdir -p "${HOME}/.claude"
 
 cp settings.json "${HOME}/.claude/settings.json"
+
+# After the copy, not before: the plugin commands write the marketplaces and the
+# enabled plugins into that same settings.json.
+sh plugins.sh

@@ -69,7 +69,7 @@ Create a new cloud environment:
     ```
     #!/bin/bash
     export X_ENVIRONMENT_MINE=1
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/ArloL/claude-code-web-environment-setup/HEAD/go.sh)"
+    /bin/bash -c "$(curl --fail --silent --show-error --location https://raw.githubusercontent.com/ArloL/claude-code-web-environment-setup/HEAD/go.sh)"
     ```
    The `export` is the opt-in the guard is looking for: it is inherited by
    `go.sh` and everything below it. Copying just the `curl` line onto a
@@ -84,8 +84,40 @@ here reach an environment when it is rebuilt. To pick them up in a session
 already running:
 
 ```sh
-X_ENVIRONMENT_MINE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/ArloL/claude-code-web-environment-setup/HEAD/go.sh)"
+X_ENVIRONMENT_MINE=1 /bin/bash -c "$(curl --fail --silent --show-error --location https://raw.githubusercontent.com/ArloL/claude-code-web-environment-setup/HEAD/go.sh)"
 ```
+
+# Claude Code plugins
+
+[`claude/plugins.sh`](claude/plugins.sh) installs two plugins at user scope, so
+they are available in every project:
+
+| | |
+| --- | --- |
+| [obra/superpowers](https://github.com/obra/superpowers) | `superpowers@superpowers-dev` |
+| [vladikk/modularity](https://github.com/vladikk/modularity) | `modularity@vladikk-modularity` |
+
+The marketplace name is whatever the repository's `.claude-plugin/marketplace.json`
+calls itself, which is not the repository name: `obra/superpowers` is the
+`superpowers-dev` marketplace. `claude plugin list` shows what ended up
+installed.
+
+The obvious command, `claude plugin marketplace add obra/superpowers`, does not
+work here. It is a `git clone` of github.com, and github.com goes through the
+credential-swapping proxy that only serves repositories granted to the session,
+so cloning somebody else's repository fails with HTTP 403 -- the same trap
+[go.sh](go.sh) documents for this repo. So the script fetches a
+`codeload.github.com` tarball, extracts it under `~/arlo-plugins/`, and adds
+that directory as a local marketplace. `codeload.github.com` is in Anthropic's
+default domain list, so this needs nothing in
+[network/allowed-domains/](network/allowed-domains/).
+
+Both plugins track `main` at image-build time and are then frozen with the rest
+of the snapshot -- neither repository publishes releases a marketplace could
+follow, and `vladikk/modularity` has no tags at all. Re-running the setup in a
+live session (see above) re-fetches and updates them; `add` and `install` on
+their own report "already there" and keep serving the cached copy, which is why
+the script also calls `marketplace update` and `plugin update`.
 
 # Playwright
 

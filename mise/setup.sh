@@ -16,9 +16,10 @@ export MISE_VERSION
 # Download first, then run: a piped `curl ... | sh` would hide a failed
 # download because dash's `sh` lacks `pipefail`, so the pipeline reports the
 # (successful) `sh` exit code while mise never actually installs. Writing to a
-# file lets `curl -fsSL` + `errexit` stop setup loudly on a blocked/failed
+# file lets `curl --fail` + `errexit` stop setup loudly on a blocked/failed
 # download instead of failing later at `mise install`.
 install_script="$(mktemp)"
 trap 'rm -f "${install_script}"' EXIT
-curl -fsSL https://mise.run/bash -o "${install_script}"
+curl --fail --silent --show-error --location https://mise.run/bash \
+    --output "${install_script}"
 sh "${install_script}"
