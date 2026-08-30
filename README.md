@@ -91,6 +91,10 @@ already running:
 X_ENVIRONMENT_MINE=1 /bin/bash -c "$(curl --fail --silent --show-error --location https://raw.githubusercontent.com/ArloL/claude-code-web-environment-setup/HEAD/go.sh)"
 ```
 
+That re-runs this repo's own scripts. It stops at the first step that fetches
+another repository -- the plugins, then the skills -- for the reason the plugins
+section below gives.
+
 # Claude Code plugins
 
 [`claude/plugins.sh`](claude/plugins.sh) installs two plugins at user scope, so
@@ -118,10 +122,30 @@ default domain list, so this needs nothing in
 
 Both plugins track `main` at image-build time and are then frozen with the rest
 of the snapshot -- neither repository publishes releases a marketplace could
-follow, and `vladikk/modularity` has no tags at all. Re-running the setup in a
-live session (see above) re-fetches and updates them; `add` and `install` on
-their own report "already there" and keep serving the cached copy, which is why
-the script also calls `marketplace update` and `plugin update`.
+follow, and `vladikk/modularity` has no tags at all. Rebuilding the environment
+is what updates them. `codeload.github.com` enforces the session's repository
+scope, so inside a session that URL answers 403 for every repository except the
+one the session was opened on, and the re-run above dies there.
+
+The script calls `marketplace update` and `plugin update` after `add` and
+`install`, which on their own report "already there" and keep serving the
+cached copy.
+
+# Claude Code skills
+
+[`claude/skills.sh`](claude/skills.sh) installs the skills from my
+[dotfiles](https://github.com/ArloL/dotfiles/tree/main/claude/skills) into
+`~/.claude/skills`, at user scope, so they are available in every project. The
+dotfiles link that directory into `~/.claude` from `install-macos.sh` only;
+`install-linux.sh` links `settings.json` and `CLAUDE.md` and stops there.
+
+It copies one skill directory at a time instead of replacing
+`~/.claude/skills`. That directory is not ours the way `settings.json` is: the
+image ships `session-start-hook` in it, and `synced/` holds the skills Claude
+Code syncs down from my account.
+
+The tarball is fetched from `codeload.github.com` for the reason the plugins
+section gives, and carries the same limitation.
 
 # Playwright
 

@@ -64,7 +64,7 @@ jobs:
         # checked too, rather than reported as an unresolved source.
         shellcheck --external-sources \
           assert-environment.sh setup.sh go.sh mise/setup.sh claude/setup.sh \
-          claude/plugins.sh \
+          claude/plugins.sh claude/skills.sh \
           claude/session-start.sh claude/docker.sh claude/ensure-docker.sh \
           network/check-reachable.sh network/discover.sh \
           network/refresh-sources.sh network/self-test.sh
