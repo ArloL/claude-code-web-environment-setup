@@ -18,3 +18,5 @@ cp settings.json "${HOME}/.claude/settings.json"
 # After the copy, not before: the plugin commands write the marketplaces and the
 # enabled plugins into that same settings.json.
 sh plugins.sh
+
+sh skills.sh
