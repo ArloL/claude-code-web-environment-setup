@@ -30,3 +30,12 @@ https://developer.mozilla.org/en-US/docs/Web/HTTP
 # The Mozilla wiki, probed through the one page this repo already depends on:
 # firefox.txt cites it as the source of truth for the Firefox version API.
 https://wiki.mozilla.org/Release_Management/Product_details
+
+# freelance.de, probed through the login page itself: it is the page the host
+# is listed for, and it renders without an account.
+https://www.freelance.de/login.php
+
+# freelancermap.de. The project listing, which is served only if the search
+# index behind it answers -- the front page alone would still render without
+# it.
+https://www.freelancermap.de/projekte

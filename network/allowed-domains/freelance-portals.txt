@@ -1,0 +1,18 @@
+# The German freelance project marketplaces. Nothing here is installed or
+# built: these are the sites whose project listings and account pages a session
+# is asked to read, and both serve their content server-rendered, so a plain
+# fetch gets the page.
+
+# freelance.de. Project listings and the account area behind
+# www.freelance.de/login.php, all on this one host.
+# Source of truth: the site itself; there is no API or mirror.
+www.freelance.de
+
+# freelancermap.de. Project listings (www.freelancermap.de/projekte) and the
+# individual project pages they link to.
+# Source of truth: the site itself; there is no API or mirror.
+www.freelancermap.de
+
+# The bare freelance.de and freelancermap.de are NOT listed. Both redirect to
+# the www host above, and the redirect is served from the bare host, so a URL
+# written without www is a 503 before it ever gets there. Write the www form.

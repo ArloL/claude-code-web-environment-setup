@@ -40,6 +40,8 @@ Create a new cloud environment:
     searchfox.org
     sonarcloud.io
     wiki.mozilla.org
+    www.freelance.de
+    www.freelancermap.de
     zig-mirror.tsimnet.eu
     zig.bcr.ist
     zig.chainsafe.dev
