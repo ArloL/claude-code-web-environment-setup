@@ -17,6 +17,7 @@
     ],
     "extends": [
         "config:recommended",
+        "customManagers:githubActionsVersions",
     ],
     "labels": [
         "dependencies",
