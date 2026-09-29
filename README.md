@@ -6,7 +6,9 @@ This sets up the Claude Code on the web environment the way I like it.
 
 Create a new cloud environment:
 
-1. Name: Mine
+1. Name: `Mine YYMM.0.N`, a CalVer tag, e.g. `Mine 2609.0.103`: the year and
+   month of creation, and N one higher than the previous environment's. N
+   starts at 100 so names sort lexicographically
 2. Network access: Custom
 3. Check **Also include default list of common package managers**. Everything
    Anthropic already trusts — npm, PyPI, Maven Central, the GitHub asset hosts,
