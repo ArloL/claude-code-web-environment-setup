@@ -35,3 +35,6 @@ sonarcloud.io
 
 # Maven Central is NOT listed: repo.maven.apache.org and repo1.maven.org are in
 # Anthropic's default list.
+# Neither is maven-central.storage-download.googleapis.com, the mirror
+# claude/session-start.sh points the Maven Wrapper at: *.googleapis.com is in
+# that list too.

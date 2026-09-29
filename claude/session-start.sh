@@ -98,6 +98,14 @@ write_session_env() {
         # resume, a compact -- would otherwise leave every Maven invocation
         # carrying the same flags twice. The quoted heredoc keeps the expansions
         # for the file rather than resolving them here.
+        #
+        # MVNW_REPOURL points the Maven Wrapper at Google's mirror of Maven
+        # Central. repo.maven.apache.org answers a share of requests from this
+        # environment's egress with HTTP 429, and the wrapper's downloader --
+        # unlike Maven's own resolver -- gives up on the first one. A session
+        # whose mvnw lost that draw fell back to the image's older /opt/maven,
+        # which a project enforcing its wrapper's Maven version then rejects.
+        # The mirror is under *.googleapis.com, in Anthropic's default list.
         cat << 'ENV_FILE'
 case "${MAVEN_ARGS:-}" in
     *"maven.artifact.threads=1"*) ;;
@@ -107,6 +115,7 @@ case "${JAVA_TOOL_OPTIONS:-}" in
     *"/etc/ssl/certs/java/cacerts"*) ;;
     *) export JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS:+$JAVA_TOOL_OPTIONS }-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts" ;;
 esac
+export MVNW_REPOURL="${MVNW_REPOURL:-https://maven-central.storage-download.googleapis.com/maven2}"
 ENV_FILE
     } >> "${CLAUDE_ENV_FILE}"
 
