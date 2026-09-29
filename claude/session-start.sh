@@ -43,37 +43,68 @@ step() {
     failed_steps+=("${label}")
 }
 
+# The repositories whose tools the session needs. A session opened on one
+# repository has it as its project directory. A session opened on several has
+# their parent, /home/user, which pins nothing itself -- running mise there
+# alone installed none of the repositories' tools.
+project_roots() {
+    echo "${CLAUDE_PROJECT_DIR}"
+    if [[ -e "${CLAUDE_PROJECT_DIR}/.git" ]]; then
+        return
+    fi
+    local dir
+    for dir in "${CLAUDE_PROJECT_DIR}"/*/; do
+        if [[ -e "${dir}.git" ]]; then
+            echo "${dir%/}"
+        fi
+    done
+}
+
 setup_mise() {
+    local roots=()
+    mapfile -t roots < <(project_roots)
+
     # mise ignores idiomatic version files (.python-version, .nvmrc, ...) unless
     # the tool is opted in, so a repo that pins its interpreter only that way
-    # gets nothing installed. Enable exactly the tools this project actually
-    # pins.
-    local idiomatic_tools=()
-    if [[ -f .python-version ]]; then
-        idiomatic_tools+=(python)
-    fi
-    if [[ -f .node-version || -f .nvmrc ]]; then
-        idiomatic_tools+=(node)
-    fi
-    if [[ -f .ruby-version ]]; then
-        idiomatic_tools+=(ruby)
-    fi
-    if [[ -f .java-version ]]; then
-        idiomatic_tools+=(java)
-    fi
-    if [[ -f .go-version ]]; then
-        idiomatic_tools+=(go)
-    fi
+    # gets nothing installed. Enable exactly the tools the repositories actually
+    # pin. The setting is one for the whole session, so it is their union.
+    local -A idiomatic=()
+    local root
+    for root in "${roots[@]}"; do
+        if [[ -f "${root}/.python-version" ]]; then
+            idiomatic[python]=1
+        fi
+        if [[ -f "${root}/.node-version" || -f "${root}/.nvmrc" ]]; then
+            idiomatic[node]=1
+        fi
+        if [[ -f "${root}/.ruby-version" ]]; then
+            idiomatic[ruby]=1
+        fi
+        if [[ -f "${root}/.java-version" ]]; then
+            idiomatic[java]=1
+        fi
+        if [[ -f "${root}/.go-version" ]]; then
+            idiomatic[go]=1
+        fi
+    done
 
-    if [[ ${#idiomatic_tools[@]} -gt 0 ]]; then
+    if [[ ${#idiomatic[@]} -gt 0 ]]; then
         MISE_IDIOMATIC_VERSION_FILE_ENABLE_TOOLS="$(
             IFS=,
-            echo "${idiomatic_tools[*]}"
+            echo "${!idiomatic[*]}"
         )"
         export MISE_IDIOMATIC_VERSION_FILE_ENABLE_TOOLS
     fi
 
-    mise install
+    # Every repository gets its install even when an earlier one failed.
+    local failed=0
+    for root in "${roots[@]}"; do
+        if ! (cd "${root}" && mise install); then
+            echo "session-start.sh: mise install failed in ${root}." >&2
+            failed=1
+        fi
+    done
+    return "${failed}"
 }
 
 # The env file is per session and survives a resume, so this appends to a file
@@ -85,7 +116,12 @@ write_session_env() {
     fi
 
     {
-        mise env --shell bash
+        # Activation rather than a one-off `mise env`: the Bash tool sources
+        # this file before every command, and activation resolves the tools for
+        # the directory that command starts in -- and again on a `cd` inside
+        # it. `mise env` fixed one PATH for the whole session, so with several
+        # repositories open none but the project directory's pins applied.
+        mise activate bash
         # Keep the precompiled-Python pin for later `mise` calls in the session
         echo "export MISE_PYTHON_COMPILE=false"
         # Keep the opt-in for later `mise` calls in the session, not just this hook
