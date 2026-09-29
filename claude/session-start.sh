@@ -134,14 +134,6 @@ write_session_env() {
         # resume, a compact -- would otherwise leave every Maven invocation
         # carrying the same flags twice. The quoted heredoc keeps the expansions
         # for the file rather than resolving them here.
-        #
-        # MVNW_REPOURL points the Maven Wrapper at Google's mirror of Maven
-        # Central. repo.maven.apache.org answers a share of requests from this
-        # environment's egress with HTTP 429, and the wrapper's downloader --
-        # unlike Maven's own resolver -- gives up on the first one. A session
-        # whose mvnw lost that draw fell back to the image's older /opt/maven,
-        # which a project enforcing its wrapper's Maven version then rejects.
-        # The mirror is under *.googleapis.com, in Anthropic's default list.
         cat << 'ENV_FILE'
 case "${MAVEN_ARGS:-}" in
     *"maven.artifact.threads=1"*) ;;
@@ -151,7 +143,6 @@ case "${JAVA_TOOL_OPTIONS:-}" in
     *"/etc/ssl/certs/java/cacerts"*) ;;
     *) export JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS:+$JAVA_TOOL_OPTIONS }-Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts" ;;
 esac
-export MVNW_REPOURL="${MVNW_REPOURL:-https://maven-central.storage-download.googleapis.com/maven2}"
 ENV_FILE
     } >> "${CLAUDE_ENV_FILE}"
 
@@ -162,6 +153,47 @@ ENV_FILE
 configure_maven() {
     echo "Configuring Maven..."
     python3 "${HOME}/arlo-setup/claude/configure-maven.py"
+}
+
+# Downloads each repository's Maven Wrapper distribution now, retrying.
+#
+# repo.maven.apache.org answers a share of requests from this environment's
+# egress with HTTP 429, and the wrapper's downloader -- unlike Maven's own
+# resolver -- gives up on the first one. A session whose mvnw lost that draw
+# fell back to the image's older /opt/maven, which a project enforcing its
+# wrapper's Maven version then rejects. Once the distribution is in
+# ~/.m2/wrapper, later mvnw calls in the session do not download it again.
+#
+# Retried here rather than pointed at a mirror: Google's mirror of Central lags
+# it by days for some artifacts, so a freshly bumped Maven would fail every time
+# instead of now and then.
+warm_maven_wrappers() {
+    local root failed=0
+    while IFS= read -r root; do
+        if [[ ! -f "${root}/mvnw" || ! -f "${root}/.mvn/wrapper/maven-wrapper.properties" ]]; then
+            continue
+        fi
+        if ! (cd "${root}" && download_maven_wrapper); then
+            echo "session-start.sh: the Maven Wrapper download failed in ${root}." >&2
+            failed=1
+        fi
+    done < <(project_roots)
+    return "${failed}"
+}
+
+download_maven_wrapper() {
+    local attempt
+    for attempt in 1 2 3 4 5; do
+        # sh rather than ./mvnw: a checkout can lose the executable bit.
+        if sh ./mvnw --version > /dev/null; then
+            echo "Maven Wrapper ready in ${PWD}"
+            return 0
+        fi
+        if [[ ${attempt} -lt 5 ]]; then
+            sleep $((2 ** attempt))
+        fi
+    done
+    return 1
 }
 
 if [[ -z "${CLAUDE_PROJECT_DIR:-}" ]]; then
@@ -182,6 +214,7 @@ export MISE_PYTHON_COMPILE=false
 step "mise install" setup_mise
 step "writing the session env file" write_session_env
 step "Maven configuration" configure_maven
+step "Maven Wrapper download" warm_maven_wrappers
 
 if [[ ${#failed_steps[@]} -gt 0 ]]; then
     echo "session-start.sh: failed steps: ${failed_steps[*]}" >&2
