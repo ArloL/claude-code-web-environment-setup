@@ -33,6 +33,7 @@ Create a new cloud environment:
     mise-versions.jdx.dev
     mise.jdx.dev
     mise.run
+    pkg.alexrp.com
     pkg.earth
     pkg.hexops.org
     playwright.download.prss.microsoft.com
