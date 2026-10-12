@@ -14,6 +14,7 @@ ziglang.org
 
 # Community mirrors, from https://ziglang.org/download/community-mirrors.txt
 fs.liujiacai.net
+pkg.alexrp.com
 pkg.earth
 pkg.hexops.org
 zig-mirror.tsimnet.eu
