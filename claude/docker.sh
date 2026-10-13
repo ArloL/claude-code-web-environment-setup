@@ -17,9 +17,8 @@
 # proxy in would in fact be the riskier choice, since dockerd would inherit
 # HTTP_PROXY too and this proxy answers plain-HTTP requests with 405.
 #
-# Pulls still obey the environment's allowed-domains list. Docker Hub needs one
-# host that is not in Anthropic's defaults -- see
-# network/allowed-domains/docker.txt.
+# Pulls still obey the environment's allowed-domains list. Anthropic's defaults
+# cover Docker Hub, including its blob CDN production.cloudfront.docker.com.
 #
 # Never fails the session. This runs from the SessionStart hook, where a
 # non-zero exit would put an error at the top of every session, and a project
