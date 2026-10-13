@@ -38,7 +38,6 @@ Create a new cloud environment:
     pkg.hexops.org
     playwright.download.prss.microsoft.com
     product-details.mozilla.org
-    production.cloudfront.docker.com
     registry.terraform.io
     searchfox.org
     sonarcloud.io
@@ -208,28 +207,8 @@ Maven work, because it depends on none of it: running it last meant any earlier
 failure took Docker down with it, under a name that pointed nowhere near the
 real cause.
 
-**Docker Hub's blob CDN is not on the allowed-domains list.** The registry
-hosts are in Anthropic's defaults, so a pull authenticates and resolves the
-manifest before dying on the layers. The default list has a *stale* CDN entry —
-`production.cloudflare.docker.com` — while Hub now redirects blobs to
-`production.cloudfront.docker.com`. Hence
-[network/allowed-domains/docker.txt](network/allowed-domains/docker.txt), which
-is why that host appears in the list above.
-
-Until that host is pasted into the environment's **Allowed domains**, a
-pull-through cache is the stopgap, because `*.gcr.io` is already in Anthropic's
-defaults:
-
-```sh
-echo '{"registry-mirrors": ["https://mirror.gcr.io"]}' | sudo tee /etc/docker/daemon.json
-# dockerd only reads that file at startup, and the session already started it
-# -- so restart it, or the mirror is configured and unused.
-sudo pkill dockerd && bash "${HOME}/arlo-setup/claude/docker.sh"
-```
-
-That covers Docker Hub only, and `dockerd` falls back to Hub when the mirror
-does not have an image — which then hits the blocked host again. Prefer fixing
-the list.
+Anthropic's defaults cover Docker Hub: the registry hosts and the blob CDN
+`production.cloudfront.docker.com` that layer downloads redirect to.
 
 `quay.io` and `registry.k8s.io` are both blocked and are not in
 `allowed-domains/`; a project pulling from either needs them added.
