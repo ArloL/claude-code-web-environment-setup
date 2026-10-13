@@ -17,14 +17,14 @@ name: Check network hosts
 
 on:
   push:
+    branches:
+    - main
     paths:
     - network/**
     - .github/workflows/check-network-hosts.yaml
   pull_request:
     branches:
     - main
-    types:
-    - reopened
     paths:
     - network/**
     - .github/workflows/check-network-hosts.yaml
