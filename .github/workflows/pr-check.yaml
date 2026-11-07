@@ -18,6 +18,7 @@ permissions: {}
 jobs:
   debug:
     runs-on: ubuntu-slim
+    timeout-minutes: 5
     steps:
     - name: Dump GitHub context
       env:
