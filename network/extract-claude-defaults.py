@@ -30,6 +30,7 @@ SECTION_HEADING = "## Default allowed domains"
 #     * raw\.githubusercontent.com    (escaped dot)
 #     * [www.github.com](http://www.github.com)   (autolinked by the renderer)
 #     * packagist.org (PHP Composer)  (trailing annotation)
+BLOCKQUOTE = re.compile(r"^\s*(?:>\s?)+")
 BULLET = re.compile(r"^\s*\*\s+(?P<body>\S.*?)\s*$")
 MARKDOWN_LINK = re.compile(r"^\[(?P<text>[^\]]+)\]\([^)]*\)$")
 DOMAIN = re.compile(r"^\*?[a-z0-9.*-]+\.[a-z]{2,}$")
@@ -54,7 +55,8 @@ def extract(markdown):
         # The next top-level heading ends the section.
         if line.startswith("## "):
             break
-        match = BULLET.match(line)
+        # Groups sit in "> [accordion]" blockquotes.
+        match = BULLET.match(BLOCKQUOTE.sub("", line))
         if not match:
             continue
         body = match.group("body")
